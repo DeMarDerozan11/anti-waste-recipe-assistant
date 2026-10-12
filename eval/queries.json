@@ -1,0 +1,240 @@
+[
+ {
+  "name": "Poulet, riz, tomate",
+  "wanted": [
+   "chicken",
+   "rice",
+   "tomato"
+  ]
+ },
+ {
+  "name": "Pâtes, oeuf, cheddar",
+  "wanted": [
+   "pasta",
+   "egg",
+   "cheddar cheese"
+  ]
+ },
+ {
+  "name": "Pommes de terre, oignon, lardons",
+  "wanted": [
+   "potato",
+   "onion",
+   "bacon"
+  ]
+ },
+ {
+  "name": "Thon, maïs, mayonnaise",
+  "wanted": [
+   "tuna",
+   "corn",
+   "mayonnaise"
+  ]
+ },
+ {
+  "name": "Saumon, citron, brocoli",
+  "wanted": [
+   "salmon",
+   "lemon",
+   "broccoli"
+  ]
+ },
+ {
+  "name": "Lait, oeuf, banane",
+  "wanted": [
+   "milk",
+   "egg",
+   "banana"
+  ]
+ },
+ {
+  "name": "Riz, oeuf, sauce soja",
+  "wanted": [
+   "rice",
+   "egg",
+   "soy sauce"
+  ]
+ },
+ {
+  "name": "Pain, lait, oeuf",
+  "wanted": [
+   "bread",
+   "milk",
+   "egg"
+  ]
+ },
+ {
+  "name": "Banane, avoine, miel",
+  "wanted": [
+   "banana",
+   "oat",
+   "honey"
+  ]
+ },
+ {
+  "name": "Chou, carotte, bouillon",
+  "wanted": [
+   "cabbage",
+   "carrot",
+   "chicken broth"
+  ]
+ },
+ {
+  "name": "Courgette, mozzarella, basilic",
+  "wanted": [
+   "zucchini",
+   "mozzarella",
+   "basil"
+  ]
+ },
+ {
+  "name": "Lentilles, carotte, cumin",
+  "wanted": [
+   "lentil",
+   "carrot",
+   "cumin"
+  ]
+ },
+ {
+  "name": "Pois chiches, lait de coco, curry",
+  "wanted": [
+   "chickpea",
+   "coconut milk",
+   "curry powder"
+  ]
+ },
+ {
+  "name": "Tofu, gingembre, riz",
+  "wanted": [
+   "tofu",
+   "ginger",
+   "rice"
+  ]
+ },
+ {
+  "name": "Chorizo, poivron, riz",
+  "wanted": [
+   "chorizo",
+   "bell pepper",
+   "rice"
+  ]
+ },
+ {
+  "name": "Boeuf haché, tomate, oignon",
+  "wanted": [
+   "ground beef",
+   "tomato",
+   "onion"
+  ]
+ },
+ {
+  "name": "Champignon, crème, ail",
+  "wanted": [
+   "mushroom",
+   "heavy cream",
+   "garlic"
+  ]
+ },
+ {
+  "name": "Épinards, oeuf, fromage",
+  "wanted": [
+   "spinach",
+   "egg",
+   "parmesan"
+  ]
+ },
+ {
+  "name": "Pomme, cannelle, beurre",
+  "wanted": [
+   "apple",
+   "cinnamon",
+   "butter"
+  ]
+ },
+ {
+  "name": "Chocolat, beurre, oeuf",
+  "wanted": [
+   "chocolate",
+   "butter",
+   "egg"
+  ]
+ },
+ {
+  "name": "Crevette, ail, citron",
+  "wanted": [
+   "shrimp",
+   "garlic",
+   "lemon"
+  ]
+ },
+ {
+  "name": "Avocat, tomate, oignon",
+  "wanted": [
+   "avocado",
+   "tomato",
+   "onion"
+  ]
+ },
+ {
+  "name": "Poulet, pomme de terre, carotte",
+  "wanted": [
+   "chicken",
+   "potato",
+   "carrot"
+  ]
+ },
+ {
+  "name": "Pâtes, tomate, ail, basilic",
+  "wanted": [
+   "pasta",
+   "tomato",
+   "garlic",
+   "basil"
+  ]
+ },
+ {
+  "name": "Riz, poulet, brocoli, carotte, ail, gingembre",
+  "wanted": [
+   "rice",
+   "chicken",
+   "broccoli",
+   "carrot",
+   "garlic",
+   "ginger"
+  ]
+ },
+ {
+  "name": "Oeuf",
+  "wanted": [
+   "egg"
+  ]
+ },
+ {
+  "name": "Poulet",
+  "wanted": [
+   "chicken"
+  ]
+ },
+ {
+  "name": "Pomme de terre",
+  "wanted": [
+   "potato"
+  ]
+ },
+ {
+  "name": "Fraise, yaourt, miel",
+  "wanted": [
+   "strawberry",
+   "yogurt",
+   "honey"
+  ]
+ },
+ {
+  "name": "Patate douce, haricot noir, maïs",
+  "wanted": [
+   "sweet potato",
+   "black bean",
+   "corn"
+  ]
+ }
+]
