@@ -16,6 +16,8 @@ DEFAULTS = {
     "language": DEFAULT_LANGUAGE,
     "view": "search",
     "chef_pending": "",
+    "scroll_to": "",
+    "scroll_count": 0,
     "searched": False,
     "wanted": [],
     "boost": [],
@@ -66,6 +68,12 @@ def t(key: str, **params) -> str:
 
 def error_text(error: Exception) -> str:
     return describe(error, language())
+
+
+def scroll_to(target: str) -> None:
+    """Demande un defilement au prochain affichage : "top", ou l'id d'un element de la page."""
+    st.session_state["scroll_to"] = target
+    st.session_state["scroll_count"] += 1
 
 
 def sticky(widget, label: str, pref: str, **kwargs):

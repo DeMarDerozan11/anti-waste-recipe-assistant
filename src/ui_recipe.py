@@ -11,7 +11,7 @@ from src.generate import LLMError
 from src.matching import line_status
 from src.ui_localize import localized, translated_lines
 from src.ui_search import status_badge
-from src.ui_state import error_text, language, t
+from src.ui_state import error_text, language, scroll_to, t
 from src.validation import validate_chat_message
 from src.visuals import GLYPHS, cover_html, harvey_svg
 
@@ -23,6 +23,7 @@ PHOTO_HEIGHT = 330
 
 def close_recipe() -> None:
     st.session_state["selected"] = None
+    scroll_to("menu" if st.session_state["view"] == "plan" else "results")
 
 
 def ask(question: str) -> None:

@@ -10,7 +10,7 @@ from src.generate import LLMError, translate_to_english
 from src.matching import STAPLES
 from src.ui_localize import localized
 from src.ui_pantry import gather_wanted
-from src.ui_state import error_text, language, sticky, sticky_options, t
+from src.ui_state import error_text, language, scroll_to, sticky, sticky_options, t
 from src.validation import validate_craving
 from src.visuals import GLYPHS, cover_html
 
@@ -56,6 +56,7 @@ def cached_opportunities(_retriever, wanted, basics, diets, max_minutes, max_cal
 
 def open_recipe(recipe: dict) -> None:
     st.session_state["selected"] = recipe
+    scroll_to("top")
 
 
 def add_boost(item: str) -> None:
@@ -217,7 +218,7 @@ def render_search_tab(retriever) -> None:
 def render_results_section(retriever) -> None:
     state = st.session_state
     state["translation_failed"] = False
-    st.markdown(f'<div class="results-head"><span class="title">{t("results_h")}</span></div>',
+    st.markdown(f'<div class="results-head" id="results"><span class="title">{t("results_h")}</span></div>',
                 unsafe_allow_html=True)
     render_filters()
     wanted = tuple(state["wanted"] + state["boost"])

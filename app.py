@@ -1,4 +1,5 @@
 """Cook Factory : recettes realisables avec ce qu'on a, et menu qui minimise les courses."""
+import json
 import zlib
 
 import streamlit as st
@@ -66,6 +67,24 @@ def render_hero(retriever) -> None:
     st.markdown(hero_html(text, len(retriever.recipes), scene, language()), unsafe_allow_html=True)
 
 
+def render_scroll() -> None:
+    """Streamlit garde la position de defilement d'une page a l'autre : sans ce script, une
+    fiche ouverte depuis le bas des resultats s'afficherait directement sur Harvey."""
+    target = st.session_state["scroll_to"]
+    if not target:
+        return
+    st.session_state["scroll_to"] = ""
+    # Le compteur change le contenu a chaque demande, sinon Streamlit ne relance pas le script.
+    st.html(
+        f"<script>/* {st.session_state['scroll_count']} */ setTimeout(() => {{"
+        "const main = document.querySelector('[data-testid=\"stMain\"]');"
+        f"const el = document.getElementById({json.dumps(target)});"
+        "if (el) el.scrollIntoView({block: 'start'}); else if (main) main.scrollTo({top: 0});"
+        "}, 80);</script>",
+        unsafe_allow_javascript=True,
+    )
+
+
 def render_home(retriever) -> None:
     render_hero(retriever)
     render_pantry()
@@ -94,3 +113,4 @@ if st.session_state["selected"] is not None:
 else:
     render_home(retriever)
 st.markdown(footer_html(t("footer_by"), t("footer_data")), unsafe_allow_html=True)
+render_scroll()

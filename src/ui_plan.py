@@ -30,7 +30,7 @@ def kpis_html(plan: dict) -> str:
 
 
 def render_menu(plan: dict, names: dict, wanted_count: int) -> None:
-    st.markdown(f'<div class="results-head"><span class="title">{t("menu_h")}</span></div>',
+    st.markdown(f'<div class="results-head" id="menu"><span class="title">{t("menu_h")}</span></div>',
                 unsafe_allow_html=True)
     menu = plan["menu"]
     for start in range(0, len(menu), COLUMNS):

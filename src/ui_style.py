@@ -235,7 +235,7 @@ button[data-testid="stBaseButton-secondary"]:hover { border-color: var(--brand);
 """
 
 _RESULTS = """
-.results-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: .4rem 1rem; margin: 1.8rem 0 .9rem; }
+.results-head { scroll-margin-top: 6.5rem; display: flex; align-items: baseline; flex-wrap: wrap; gap: .4rem 1rem; margin: 1.8rem 0 .9rem; }
 .results-head .title { font-family: var(--display); font-size: 1.6rem; font-weight: 750; color: var(--ink); }
 .results-head .count { color: var(--muted); font-weight: 600; }
 .insight { position: relative; overflow: hidden; min-height: 168px; border-radius: 22px; padding: 1.3rem 1.5rem; }
