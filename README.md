@@ -12,7 +12,7 @@ Spanish and Japanese.
 
 [![tests](../../actions/workflows/tests.yml/badge.svg)](../../actions/workflows/tests.yml)
 
-**Live demo:** _coming soon_ · *Version française : [docs/README.fr.md](docs/README.fr.md)*
+**Live demo:** https://anti-waste-recipes.streamlit.app/ · *Version française : [docs/README.fr.md](docs/README.fr.md)*
 
 <!-- Screenshot or GIF: add docs/screenshots/demo.gif, then uncomment the next line. -->
 <!-- ![Demo](docs/screenshots/demo.gif) -->
