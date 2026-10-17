@@ -74,13 +74,15 @@ Design choices worth noting:
 python -m src.evaluate --write
 ```
 
-Measured on 29,873 Food.com recipes (32% with a photo) with 30 realistic fridge contents:
+Measured on the full local index of 149,335 Food.com recipes (32% with a photo) with 30
+realistic fridge contents. The online demo runs on a 12,000-recipe subset (GitHub file-size
+limits), so it finds fewer ready-to-cook recipes than these numbers suggest.
 
 | Variant | Queries with ≥ 1 recipe needing no shopping | No-shopping recipes in top 12 | Items to buy (avg) | Ingredient coverage | p95 latency |
 |---|---|---|---|---|---|
-| Basics assumed, recipes with a photo (app default) | 21/30 | 3.3 | 1.5 | 73% | 0.21 s |
-| Basics assumed, all recipes | 24/30 | 5.8 | 0.9 | 74% | 0.23 s |
-| No basics, recipes with a photo | 13/30 | 1.0 | 2.3 | 71% | 0.22 s |
+| Basics assumed, recipes with a photo (app default) | 27/30 | 6.6 | 0.7 | 75% | 1.09 s |
+| Basics assumed, all recipes | 29/30 | 8.6 | 0.3 | 77% | 0.90 s |
+| No basics, recipes with a photo | 21/30 | 3.9 | 1.1 | 72% | 1.45 s |
 
 Full report: [docs/evaluation.md](docs/evaluation.md).
 
@@ -91,7 +93,7 @@ conda create -n recettes python=3.11 -y && conda activate recettes
 pip install -r requirements.txt     # if faiss-cpu fails: conda install -c conda-forge faiss-cpu
 cp .env.example .env                # add your Groq API key
 
-python -m src.ingest --input data/recipes.csv --format foodcom --sample 30000
+python -m src.ingest --input data/recipes.csv --format foodcom --sample 150000
 python -m src.check_images          # drop dead image links
 python -m streamlit run app.py
 python -m pytest
