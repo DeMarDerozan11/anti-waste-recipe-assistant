@@ -14,6 +14,8 @@ MAX_LLM_CALLS = int(os.getenv("MAX_LLM_CALLS_PER_SESSION", "60"))
 DEFAULTS = {
     "llm_calls": 0,
     "language": DEFAULT_LANGUAGE,
+    "view": "search",
+    "chef_pending": "",
     "searched": False,
     "wanted": [],
     "boost": [],

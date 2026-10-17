@@ -1,6 +1,6 @@
 import pytest
 
-from src.format import format_duration, recipe_facts
+from src.format import coverage, format_count, format_duration, recipe_facts
 
 
 @pytest.mark.parametrize("minutes, expected", [
@@ -31,3 +31,16 @@ def test_detail_facts_follow_the_language():
     assert recipe_facts(recipe, detailed=True, language="en") == [
         "1 h 30", "2 servings", "5 g protein", "rated 4.0/5"]
     assert recipe_facts(recipe, detailed=True, language="ja")[0] == "1時間30分"
+
+
+def test_counts_use_the_thousands_separator_of_each_language():
+    assert format_count(149335, "fr") == "149 335"
+    assert format_count(149335, "en") == "149,335"
+    assert format_count(149335, "es") == "149.335"
+    assert format_count(999, "ja") == "999"
+
+
+def test_coverage_is_the_share_of_ingredients_already_at_home():
+    assert coverage({"have": ["a", "b"], "missing": ["c"]}) == 67
+    assert coverage({"have": ["a"], "missing": []}) == 100
+    assert coverage({"have": [], "missing": []}) == 100

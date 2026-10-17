@@ -40,3 +40,17 @@ def recipe_facts(recipe: dict, detailed: bool = False, language: str = DEFAULT_L
     if detailed and recipe.get("rating"):
         facts.append(translate("rating", language, n=f"{recipe['rating']:.1f}"))
     return facts
+
+
+_THOUSANDS = {"fr": " ", "en": ",", "es": ".", "ja": ","}
+
+
+def format_count(n: int, language: str = DEFAULT_LANGUAGE) -> str:
+    """12000 -> '12 000' (fr), '12,000' (en), '12.000' (es)."""
+    return f"{n:,}".replace(",", _THOUSANDS[language])
+
+
+def coverage(recipe: dict) -> int:
+    """Part des ingredients de la recette (hors basiques) deja chez soi, en pourcentage."""
+    have, missing = len(recipe["have"]), len(recipe["missing"])
+    return round(100 * have / (have + missing)) if have + missing else 100

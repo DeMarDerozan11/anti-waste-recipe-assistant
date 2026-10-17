@@ -1,23 +1,24 @@
-"""Onglet Recherche : envie particuliere, filtres, cartes de resultats."""
+"""Recherche : envie particuliere, filtres, encadres « realisable » et « meilleur achat », cartes."""
 import html
 
 import streamlit as st
 
 from src.catalog import Filters
 from src.diets import DIETS
-from src.format import recipe_facts
+from src.format import coverage, format_duration
 from src.generate import LLMError, translate_to_english
 from src.matching import STAPLES
 from src.ui_localize import localized
 from src.ui_pantry import gather_wanted
 from src.ui_state import error_text, language, sticky, sticky_options, t
 from src.validation import validate_craving
-from src.visuals import cover_html
+from src.visuals import GLYPHS, cover_html
 
 SHOWN = 12
 SEMANTIC_POOL = 60
 COLUMNS = 4
 LIGHT_KCAL = 400
+FULL_MATCH = 100
 # Les recettes sans photo sont masquees tant que les illustrations de repli ne sont pas validees.
 REQUIRE_PHOTO = True
 TIME_FILTERS = {"any": None, "30": 30, "60": 60}
@@ -65,26 +66,47 @@ def clear_boost() -> None:
     st.session_state["boost"] = []
 
 
-def card_text(recipe: dict, wanted_count: int, title: str, lang: str) -> str:
-    """Titre, etat des courses et details d'une carte (le titre vient du jeu de donnees : echappe)."""
+def status_badge(recipe: dict, extra_class: str = "") -> str:
     if recipe["missing"]:
-        status = f'<span class="pill">{t("to_buy", n=len(recipe["missing"]))}</span>'
+        text, kind, glyph = t("to_buy", n=len(recipe["missing"])), "buy", GLYPHS["plus"]
     else:
-        status = f'<span class="pill ok">{t("ready")}</span>'
-    details = [t("used_of", have=len(recipe["have"]), wanted=wanted_count),
-               *recipe_facts(recipe, language=lang)]
+        text, kind, glyph = t("ready"), "ok", GLYPHS["check"]
+    return f'<span class="badge {kind} {extra_class}">{glyph}{text}</span>'
+
+
+def card_html(recipe: dict, wanted_count: int, title: str, lang: str, label: str = "",
+              delay_ms: int = 0) -> str:
+    """Carte d'une recette (le titre vient du jeu de donnees : echappe). `label` (« Jour 2 »)
+    s'affiche en haut a gauche et pousse le badge d'achats a droite."""
+    badges = status_badge(recipe, "right" if label else "")
+    if label:
+        badges = f'<span class="badge day">{html.escape(label)}</span>{badges}'
+    time = ""
+    if recipe.get("minutes"):
+        time = f'<span class="rc-time">{GLYPHS["clock"]}{format_duration(recipe["minutes"], lang)}</span>'
+    pct = coverage(recipe)
+    meta = [t("used_of", have=len(recipe["have"]), wanted=wanted_count)]
+    if recipe.get("calories"):
+        meta.append(f'{GLYPHS["flame"]}{recipe["calories"]:.0f} kcal')
+    if recipe.get("rating"):
+        meta.append(f'{GLYPHS["star"]}{recipe["rating"]:.1f}')
     return (
-        f'<div class="card-title">{html.escape(title)}</div><div>{status}</div>'
-        f'<div class="card-sub">{" · ".join(details)}</div>'
+        f'<div class="rc" style="animation-delay:{delay_ms}ms"><div class="rc-media">'
+        f"{cover_html(recipe, 190)}{badges}{time}</div><div class=\"rc-body\">"
+        f'<div class="rc-title">{html.escape(title)}</div>'
+        f'<div class="rc-match"><div class="rc-bar"><i class="{"full" if pct == FULL_MATCH else ""}" '
+        f'style="width:{pct}%"></i></div><span>{t("match", pct=pct)}</span></div>'
+        f'<div class="rc-meta">{"".join(f"<span>{m}</span>" for m in meta)}</div></div></div>'
     )
 
 
-def render_card(index: int, recipe: dict, wanted_count: int, title: str) -> None:
+def render_card(key: str, recipe: dict, wanted_count: int, title: str, label: str = "",
+                delay_ms: int = 0) -> None:
     """Toute la carte est cliquable : le bouton, invisible, la recouvre (voir ui_style)."""
-    with st.container(key=f"card_{index}"):
-        st.markdown(cover_html(recipe), unsafe_allow_html=True)
-        st.markdown(card_text(recipe, wanted_count, title, language()), unsafe_allow_html=True)
-        st.button(t("open_recipe"), key=f"open_{index}", on_click=open_recipe, args=(recipe,))
+    with st.container(key=f"card_{key}"):
+        st.markdown(card_html(recipe, wanted_count, title, language(), label, delay_ms),
+                    unsafe_allow_html=True)
+        st.button(t("open_recipe"), key=f"open_{key}", on_click=open_recipe, args=(recipe,))
 
 
 def render_results(results: list[dict], wanted_count: int, names: dict) -> None:
@@ -95,42 +117,64 @@ def render_results(results: list[dict], wanted_count: int, names: dict) -> None:
             if index < len(results):
                 with column:
                     recipe = results[index]
-                    render_card(index, recipe, wanted_count, names.get(recipe["title"], recipe["title"]))
+                    render_card(str(index), recipe, wanted_count,
+                                names.get(recipe["title"], recipe["title"]), delay_ms=index * 60)
 
 
 def render_filters() -> None:
-    first, second = st.columns(2)
-    with first:
-        sticky(st.checkbox, t("basics_label"), "pref_basics", value=st.session_state["pref_basics"])
-        sticky_options(st.multiselect, t("diet_label"), "pref_diets", list(DIETS),
-                       lambda d: t(f"diet_{d}"), multi=True, placeholder=t("none_option"))
-    with second:
-        sticky_options(st.radio, t("shopping_label"), "pref_shopping", list(SHOPPING_FILTERS),
-                       lambda c: t(f"shop_{c}"), horizontal=True)
-        sticky_options(st.radio, t("time_label"), "pref_time", list(TIME_FILTERS),
-                       lambda c: t("time_any") if c == "any" else t(f"time_{c}"), horizontal=True)
-        sticky(st.checkbox, t("light_label", kcal=LIGHT_KCAL), "pref_light",
-               value=st.session_state["pref_light"])
+    with st.expander(t("filters_h"), icon=":material/tune:"):
+        first, second = st.columns(2)
+        with first:
+            sticky(st.checkbox, t("basics_label"), "pref_basics", value=st.session_state["pref_basics"])
+            sticky_options(st.multiselect, t("diet_label"), "pref_diets", list(DIETS),
+                           lambda d: t(f"diet_{d}"), multi=True, placeholder=t("none_option"))
+        with second:
+            sticky_options(st.radio, t("shopping_label"), "pref_shopping", list(SHOPPING_FILTERS),
+                           lambda c: t(f"shop_{c}"), horizontal=True)
+            sticky_options(st.radio, t("time_label"), "pref_time", list(TIME_FILTERS),
+                           lambda c: t("time_any") if c == "any" else t(f"time_{c}"), horizontal=True)
+            sticky(st.checkbox, t("light_label", kcal=LIGHT_KCAL), "pref_light",
+                   value=st.session_state["pref_light"])
+
+
+def ready_html(cookable: int) -> str:
+    if not cookable:
+        return f'<div class="insight zero"><div class="label">{t("cookable_zero")}</div></div>'
+    return (
+        f'<div class="insight ready"><div class="big">{cookable}</div>'
+        f'<div class="label">{t("cookable_label")}</div></div>'
+    )
+
+
+def best_buy_html(purchase: dict, names: dict) -> str:
+    examples = ", ".join(html.escape(names[e]) for e in purchase["examples"])
+    return (
+        f'<div class="insight best"><div class="kicker">{GLYPHS["bolt"]}{t("best_label")}</div>'
+        f'<div class="item">{html.escape(names[purchase["item"]])}</div>'
+        f'<div class="unlocks">{t("best_unlocks", count=purchase["count"])}</div>'
+        f'<div class="examples">{t("best_examples", examples=examples)}</div></div>'
+    )
 
 
 def render_opportunities(info: dict) -> None:
-    if info["cookable"]:
-        st.success(t("cookable", n=info["cookable"]))
     purchases = info["purchases"]
+    columns = st.columns(2 if purchases else 1, gap="medium")
+    columns[0].markdown(ready_html(info["cookable"]), unsafe_allow_html=True)
     if purchases:
         texts = [p["item"] for p in purchases] + [e for p in purchases for e in p["examples"]]
         names = localized(texts)
         top = purchases[0]
-        st.info(t("best_purchase", item=names[top["item"]], count=top["count"],
-                  examples=", ".join(names[e] for e in top["examples"])))
-        st.button(t("what_if", item=names[top["item"]]), on_click=add_boost, args=(top["item"],))
-        others = [f"{names[p['item']]} ({p['count']})" for p in purchases[1:]]
-        if others:
-            st.caption(t("other_purchases", items=", ".join(others)))
+        with columns[1]:
+            st.markdown(best_buy_html(top, names), unsafe_allow_html=True)
+            st.button(t("what_if", item=names[top["item"]]), on_click=add_boost, args=(top["item"],),
+                      icon=":material/auto_awesome:")
+            others = [f"{names[p['item']]} ({p['count']})" for p in purchases[1:]]
+            if others:
+                st.caption(t("other_purchases", items=", ".join(others)))
     if st.session_state["boost"]:
         boost = localized(st.session_state["boost"])
         st.caption(t("simulated", items=", ".join(boost[b] for b in st.session_state["boost"])))
-        st.button(t("cancel_simulated"), on_click=clear_boost)
+        st.button(t("cancel_simulated"), on_click=clear_boost, icon=":material/undo:")
 
 
 def run_search(ingredients_wanted: list[str], craving: str) -> None:
@@ -147,14 +191,19 @@ def run_search(ingredients_wanted: list[str], craving: str) -> None:
 
 def render_search_tab(retriever) -> None:
     craving = ""
-    if retriever.semantic_available:
-        craving = st.text_input(
-            t("craving_label"),
-            value=st.session_state["last_precision"],
-            placeholder=t("craving_placeholder"),
-            key="s_prec",
-        )
-    if st.button(t("search_button"), type="primary"):
+    with st.container(key="panel_search"):
+        if retriever.semantic_available:
+            field, action = st.columns([4, 1.4], vertical_alignment="bottom")
+            craving = field.text_input(
+                t("craving_label"),
+                value=st.session_state["last_precision"],
+                placeholder=t("craving_placeholder"),
+                key="s_prec",
+            )
+        else:
+            action = st.container()
+        clicked = action.button(t("search_button"), type="primary", icon=":material/search:")
+    if clicked:
         try:
             with st.spinner(t("searching")):
                 run_search(gather_wanted(), craving)
@@ -166,9 +215,11 @@ def render_search_tab(retriever) -> None:
 
 
 def render_results_section(retriever) -> None:
-    render_filters()
     state = st.session_state
     state["translation_failed"] = False
+    st.markdown(f'<div class="results-head"><span class="title">{t("results_h")}</span></div>',
+                unsafe_allow_html=True)
+    render_filters()
     wanted = tuple(state["wanted"] + state["boost"])
     diets = tuple(state["pref_diets"])
     max_minutes = TIME_FILTERS[state["pref_time"]]
@@ -184,6 +235,12 @@ def render_results_section(retriever) -> None:
         st.info(t("no_results"))
         return
     names = localized([r["title"] for r in results])
+    ready = sum(1 for r in results if not r["missing"])
+    st.markdown(
+        f'<div class="results-head"><span class="count">{t("results_count", n=len(results), ready=ready)}'
+        "</span></div>",
+        unsafe_allow_html=True,
+    )
     if state["translation_failed"]:
         st.caption(t("translation_unavailable"))
     render_results(results, len(wanted), names)

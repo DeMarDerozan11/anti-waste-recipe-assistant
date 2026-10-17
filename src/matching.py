@@ -49,3 +49,18 @@ def analyze(wanted: list[str], recipe: dict, staples: frozenset = frozenset()) -
         if not any(covers(wt, nt) for wt in wanted_tokens):
             missing.append(name)
     return {"have": have, "missing": missing}
+
+
+def line_status(lines: list[str], have: list[str], missing: list[str]) -> list[str]:
+    """Pour chaque ligne d'ingredient : 'have', 'missing' ou '' (basique, non reconnu).
+
+    Le nom le plus precis l'emporte : '1 cup chicken broth' est 'chicken broth' (a acheter)
+    plutot que 'chicken' (deja la).
+    """
+    names = [(tokens(n), "have") for n in have] + [(tokens(n), "missing") for n in missing]
+    result = []
+    for line in lines:
+        words = tokens(line)
+        found = [(len(nt), status) for nt, status in names if nt and nt <= words]
+        result.append(max(found)[1] if found else "")
+    return result

@@ -1,7 +1,19 @@
 [theme]
 base = "light"
-primaryColor = "#D9480F"
-backgroundColor = "#FFFFFF"
-secondaryBackgroundColor = "#FFF4EC"
-textColor = "#1F2933"
-font = "sans serif"
+primaryColor = "#E8590C"
+backgroundColor = "#FFF8F0"
+secondaryBackgroundColor = "#FBEEE2"
+textColor = "#221A15"
+borderColor = "#EADCCD"
+# Virgules encodees (%2C) : une virgule separe normalement plusieurs polices.
+headingFont = "Fraunces:https://fonts.googleapis.com/css2?family=Fraunces:opsz%2Cwght%2CSOFT@9..144%2C500..800%2C0..100&display=swap"
+baseRadius = "12px"
+buttonRadius = "full"
+
+[client]
+toolbarMode = "minimal"
+
+[server]
+# transformers 5 cree des modules alias qui importent torchvision des qu'on les inspecte ; la
+# surveillance des fichiers de Streamlit les inspecte tous et remplit le terminal d'erreurs.
+fileWatcherType = "none"

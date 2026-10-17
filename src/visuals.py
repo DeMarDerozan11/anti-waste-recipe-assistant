@@ -148,6 +148,28 @@ def harvey_svg(size: int = 64) -> str:
     return HARVEY.format(size=size)
 
 
+# Petits symboles d'interface, dans la couleur du texte qui les entoure.
+_GLYPH = (
+    '<svg class="glyph" viewBox="0 0 24 24" width="1em" height="1em" fill="none" '
+    'stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">{}</svg>'
+)
+GLYPHS = {
+    "clock": _GLYPH.format('<circle cx="12" cy="12" r="9"/><path d="M12 7 V12 L15 14"/>'),
+    "star": _GLYPH.format(
+        '<path d="M12 3 L14.7 8.6 L20.8 9.3 L16.3 13.5 L17.5 19.6 L12 16.6 L6.5 19.6 L7.7 13.5 '
+        'L3.2 9.3 L9.3 8.6 Z" fill="currentColor"/>'),
+    "check": _GLYPH.format('<path d="M5 12.5 L10 17 L19 7.5"/>'),
+    "plus": _GLYPH.format('<path d="M12 5 V19 M5 12 H19"/>'),
+    "arrow": _GLYPH.format('<path d="M5 12 H19 M13 6 L19 12 L13 18"/>'),
+    "leaf": _GLYPH.format('<path d="M5 19 C4 10 10 4 20 4 C20 14 14 20 5 19 Z"/><path d="M5 19 L13 11"/>'),
+    "flame": _GLYPH.format('<path d="M12 3 C13 8 18 9 18 14 A6 6 0 0 1 6 14 C6 11 8 10 9 8 '
+                           'C10 10 11 10 12 9 C12 7 11 5 12 3 Z"/>'),
+    "users": _GLYPH.format('<circle cx="9" cy="8" r="3.5"/><path d="M3 20 C3 15 15 15 15 20"/>'
+                           '<path d="M16 4.5 A3.5 3.5 0 0 1 16 11.5 M18 14.5 C20 15.3 21 17 21 20"/>'),
+    "bolt": _GLYPH.format('<path d="M13 3 L5 13.5 H12 L11 21 L19 10.5 H12 Z"/>'),
+}
+
+
 def _safe_css_url(url: str) -> str:
     """Encode guillemets, parentheses et espaces : l'URL ne peut pas sortir de url('...')."""
     return html.escape(quote(url, safe=":/?&=#%+,;@~-_.!*$"), quote=True)
@@ -161,11 +183,12 @@ def cover_html(recipe: dict, height: int = 170) -> str:
     photo = ""
     if url.startswith(("http://", "https://")):
         photo = (
-            f'<div style="position:absolute;inset:0;background:url(\'{_safe_css_url(url)}\') '
-            'center/cover no-repeat"></div>'
+            f'<div class="cover-photo" style="position:absolute;inset:0;'
+            f"background:url('{_safe_css_url(url)}') center/cover no-repeat\"></div>"
         )
     return (
-        f'<div style="position:relative;height:{height}px;border-radius:12px;overflow:hidden;'
-        f"background:linear-gradient(135deg,{start},{end});display:flex;align-items:center;"
-        f'justify-content:center">{icon_svg(pick_icon(recipe), ink, int(height * 0.62))}{photo}</div>'
+        f'<div class="cover" style="position:relative;height:{height}px;border-radius:12px;'
+        f"overflow:hidden;background:linear-gradient(135deg,{start},{end});display:flex;"
+        f'align-items:center;justify-content:center">'
+        f"{icon_svg(pick_icon(recipe), ink, int(height * 0.62))}{photo}</div>"
     )

@@ -1,4 +1,8 @@
-# Assistant Recettes anti-gaspi
+<p align="center"><img src="../assets/logo.svg" width="88" alt=""></p>
+
+<h1 align="center">Cook Factory</h1>
+
+<p align="center"><b>Ce qu'il y a dans votre frigo, transformé en repas.</b></p>
 
 *English version: [README.md](../README.md)*
 

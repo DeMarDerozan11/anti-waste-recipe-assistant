@@ -84,13 +84,19 @@ def translate_to_english(text: str) -> str:
     return result or text
 
 
-def translate_batch(texts: list[str], language: str) -> list[str]:
-    """Traduit des titres ou des noms d'aliments en un seul appel ; renvoie l'original en cas
-    de reponse inexploitable plutot que de decaler les traductions."""
+TITLES = "recipe titles or food names"
+RECIPE_LINES = (
+    "lines of one recipe: ingredients with their quantities, then the steps. "
+    "Keep every quantity and unit"
+)
+
+
+def translate_batch(texts: list[str], language: str, kind: str = TITLES) -> list[str]:
+    """Traduit plusieurs textes en un seul appel ; renvoie l'original en cas de reponse
+    inexploitable plutot que de decaler les traductions."""
     system = (
-        f"Translate each English text into {LLM_NAMES[language]}. These are recipe titles or "
-        'food names. Reply only with JSON {"translations": [...]} holding exactly '
-        f"{len(texts)} strings, in the same order."
+        f"Translate each English text into {LLM_NAMES[language]}. These are {kind}. Reply only "
+        f'with JSON {{"translations": [...]}} holding exactly {len(texts)} strings, in the same order.'
     )
     raw = chat(
         [{"role": "system", "content": system},
@@ -105,16 +111,3 @@ def translate_batch(texts: list[str], language: str) -> list[str]:
     if not isinstance(translated, list) or len(translated) != len(texts):
         return list(texts)
     return [str(t) for t in translated]
-
-
-def translate_recipe(recipe: dict, language: str) -> str:
-    system = (
-        f"Translate the recipe into {LLM_NAMES[language]}. Keep every quantity. Output "
-        "markdown: a '### ' heading with the title, then the translated words for "
-        "'Ingredients' and 'Steps' as bold labels, ingredients as a bullet list, steps as a "
-        "numbered list. Output only the translation."
-    )
-    return chat(
-        [{"role": "system", "content": system}, {"role": "user", "content": format_recipe(recipe)}],
-        temperature=0,
-    )

@@ -1,6 +1,9 @@
-# Anti-waste Recipe Assistant
+<p align="center"><img src="assets/logo.svg" width="88" alt=""></p>
 
-**Cook what you already have, and buy as little as possible.**
+<h1 align="center">Cook Factory</h1>
+
+<p align="center"><b>What's in your fridge, turned into dinner.</b><br>
+Cook what you already have, and buy as little as possible.</p>
 
 Tick the food you have at home: the app finds recipes you can actually make, tells you which
 single purchase would unlock the most new recipes, plans several days of meals that share the
@@ -29,6 +32,7 @@ items. This app treats the question as a feasibility problem first.
 | **Fridge photo** | A vision model lists the food in a photo; items are matched to the checklist, the rest goes to a free-text field. |
 | **4 languages** | 142 checklist items are translated locally (no API call); recipe titles and pages are translated by the LLM in batches, with an English fallback. |
 | **Filters** | Diet (vegetarian, vegan, gluten-free, dairy-free, pork-free, nut-free), total time, light meals, number of items to buy. |
+| **Interface** | A custom design on top of Streamlit: an animated landing page, clickable recipe cards with a "% already at home" bar, and recipe pages that mark each ingredient as at home or to buy. |
 
 ## How it works
 

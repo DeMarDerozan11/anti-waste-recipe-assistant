@@ -1,4 +1,4 @@
-from src.matching import STAPLES, analyze, tokens
+from src.matching import STAPLES, analyze, line_status, tokens
 
 RECIPE = {
     "title": "Tomato Chicken Rice",
@@ -36,3 +36,13 @@ def test_staples_are_not_counted_as_missing():
 def test_tokens_are_consistent_on_both_sides():
     assert tokens("Tomatoes") == tokens("tomato")
     assert tokens("berries") == tokens("berry")
+
+
+def test_each_ingredient_line_is_marked_with_the_most_precise_name():
+    lines = ["1 cup chicken broth", "2 boneless chicken breasts", "1 tsp salt", "3 large eggs"]
+    assert line_status(lines, have=["chicken", "egg"], missing=["chicken broth"]) == [
+        "missing", "have", "", "have"]
+
+
+def test_lines_are_unmarked_when_nothing_matches():
+    assert line_status(["a pinch of love"], have=["rice"], missing=[]) == [""]

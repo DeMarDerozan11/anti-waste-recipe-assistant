@@ -1,10 +1,12 @@
 """Liste d'aliments a cocher, rangee par categories, avec une section « Autre » en texte libre."""
+import html
 from functools import partial
 
 import streamlit as st
 
 from src.generate import LLMError, translate_to_english
 from src.pantry import CATEGORIES, item_label, match_item
+from src.ui_hero import section_html
 from src.ui_localize import localized
 from src.ui_state import error_text, language, pantry_key, sticky, t
 from src.validation import split_ingredients, validate_other
@@ -77,34 +79,41 @@ def render_photo_input() -> None:
 
 def render_summary() -> None:
     items = selected_items()
+    if not items:
+        st.markdown(f'<div class="chips empty">{t("nothing_selected")}</div>', unsafe_allow_html=True)
+        return
     names = localized(items)
-    if items:
-        st.caption(t("selected_summary", n=len(items), items=", ".join(names[i] for i in items)))
-        st.button(t("clear_all"), on_click=clear_all, key="clear_all_button")
-    else:
-        st.caption(t("nothing_selected"))
+    chips = "".join(f'<span class="chip">{html.escape(names[i])}</span>' for i in items)
+    left, right = st.columns([5, 1], vertical_alignment="center")
+    left.markdown(
+        f'<div class="chips"><span class="count">{t("selected_count", n=len(items))}</span>{chips}</div>',
+        unsafe_allow_html=True,
+    )
+    right.button(t("clear_all"), on_click=clear_all, key="clear_all_button",
+                 icon=":material/close:")
 
 
 def render_pantry() -> None:
     lang = language()
-    st.subheader(t("pantry_title"))
-    st.caption(t("pantry_hint"))
-    tabs = st.tabs([c.labels[lang] for c in CATEGORIES] + [t("other_tab")])
-    for tab, category in zip(tabs, CATEGORIES):
-        with tab:
-            pref = pantry_key(category.key)
+    st.markdown(section_html(1, t("pantry_title"), t("pantry_hint"), anchor="pantry"),
+                unsafe_allow_html=True)
+    with st.container(key="panel_pantry"):
+        tabs = st.tabs([c.labels[lang] for c in CATEGORIES] + [t("other_tab")])
+        for tab, category in zip(tabs, CATEGORIES):
+            with tab:
+                pref = pantry_key(category.key)
+                sticky(
+                    st.pills, category.labels[lang], pref,
+                    options=[item.en for item in category.items],
+                    selection_mode="multi",
+                    default=st.session_state[pref],
+                    format_func=partial(item_label, language=lang),
+                    label_visibility="collapsed",
+                )
+        with tabs[-1]:
             sticky(
-                st.pills, category.labels[lang], pref,
-                options=[item.en for item in category.items],
-                selection_mode="multi",
-                default=st.session_state[pref],
-                format_func=partial(item_label, language=lang),
-                label_visibility="collapsed",
+                st.text_input, t("other_label"), "other_text",
+                value=st.session_state["other_text"], placeholder=t("other_placeholder"),
             )
-    with tabs[-1]:
-        sticky(
-            st.text_input, t("other_label"), "other_text",
-            value=st.session_state["other_text"], placeholder=t("other_placeholder"),
-        )
-    render_summary()
-    render_photo_input()
+        render_summary()
+        render_photo_input()

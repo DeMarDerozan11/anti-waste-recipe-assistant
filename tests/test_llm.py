@@ -116,3 +116,16 @@ def test_the_call_guard_runs_before_any_request(monkeypatch):
     finally:
         generate.set_call_guard(None)
     assert describe(caught.value, "en") == "AI call limit reached for this session (3): please try again later."
+
+
+def test_recipe_lines_are_translated_with_their_own_instructions(monkeypatch):
+    seen = []
+
+    def fake_chat(messages, **_):
+        seen.append(messages[0]["content"])
+        return '{"translations": ["2 tasses de riz", "Cuire."]}'
+
+    monkeypatch.setattr(generate, "chat", fake_chat)
+    lines = generate.translate_batch(["2 cups rice", "Cook."], "fr", generate.RECIPE_LINES)
+    assert lines == ["2 tasses de riz", "Cuire."]
+    assert "Keep every quantity" in seen[0] and "French" in seen[0]

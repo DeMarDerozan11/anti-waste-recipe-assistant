@@ -7,7 +7,7 @@ MAX_TURNS = 8
 
 def ask_chef(recipe: dict, history: list[dict], question: str, language: str = "fr") -> str:
     system = (
-        "You are Harvey, a friendly chef in an anti-food-waste kitchen. "
+        "You are Harvey, the friendly chef of Cook Factory, an anti-food-waste cooking app. "
         "Answer questions about THIS recipe only: "
         "substitutions, adapting to a diet or missing equipment, scaling servings, technique. "
         "Be concise and practical. If the recipe does not say, give a safe general guideline "
